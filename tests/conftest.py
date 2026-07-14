@@ -88,10 +88,10 @@ def wait_for_server(url: str, timeout: int = 30) -> bool:
     start_time = time.time()
     while (time.time() - start_time) < timeout:
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 return True
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.RequestException:
             pass
         time.sleep(1)
     return False
@@ -219,10 +219,12 @@ def fastapi_server():
     logger.info("Starting test server...")
 
     try:
+        # Discard server output: unread PIPE buffers can fill (~64KB) and
+        # deadlock uvicorn mid-response, hanging the whole test run.
         process = subprocess.Popen(
             ['python', 'main.py'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
         )
         if not wait_for_server(server_url, timeout=30):
             raise ServerStartupError("Failed to start test server")
