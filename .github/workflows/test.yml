@@ -73,9 +73,12 @@ jobs:
         run: docker build -t app:test .
 
       - name: Install Trivy
+        # Fetch install script from the pinned release tag (immutable, not a mutable branch),
+        # and install into a writable dir ($RUNNER_TEMP) to avoid /usr/local/bin permission errors.
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sh -s -- -b /usr/local/bin v0.58.1
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/v0.58.1/contrib/install.sh \
+            | sh -s -- -b "$RUNNER_TEMP/bin" v0.58.1
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 
       - name: Run Trivy vulnerability scanner
         env:
