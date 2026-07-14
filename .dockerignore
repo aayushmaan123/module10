@@ -1,0 +1,25 @@
+# Never bake the local virtualenv into the image — it drags in stale,
+# vulnerable packages (python-jose, old urllib3/h11) flagged by Trivy.
+venv/
+.venv/
+env/
+
+# VCS / CI / docs — not needed at runtime
+.git/
+.github/
+*.md
+
+# Tests and coverage artifacts
+tests/
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Python caches / build cruft
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+
+# Local env / secrets
+.env
